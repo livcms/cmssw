@@ -5,8 +5,11 @@
 
 #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
 #include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/Framework/interface/ESWatcher.h"
+#include "FWCore/Framework/interface/FrameworkfwdMostUsed.h"
 #include "FWCore/Framework/interface/ProducesCollector.h"
 #include "FWCore/Utilities/interface/EDGetToken.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
 #include "SimCalorimetry/EcalSimAlgos/interface/EcalDigitizerTraits.h"
 #include "SimDataFormats/CaloHit/interface/PCaloHit.h"
 #include "SimGeneral/MixingModule/interface/DigiAccumulatorMixMod.h"
@@ -21,11 +24,8 @@ class PileUpEventPrincipal;
 class EcalTimeMapDigitizer;
 
 namespace edm {
-  class Event;
-  class EventSetup;
   template <typename T>
   class Handle;
-  class ParameterSet;
 }  // namespace edm
 
 class EcalTimeDigiProducer : public DigiAccumulatorMixMod {
@@ -52,6 +52,8 @@ private:
   const edm::InputTag m_hitsProducerTagEE;
   const edm::EDGetTokenT<std::vector<PCaloHit>> m_hitsProducerTokenEB;
   const edm::EDGetTokenT<std::vector<PCaloHit>> m_hitsProducerTokenEE;
+  const edm::ESGetToken<CaloGeometry, CaloGeometryRecord> m_geometryToken;
+  edm::ESWatcher<CaloGeometryRecord> m_geometryWatcher;
 
 private:
   int m_timeLayerEB;

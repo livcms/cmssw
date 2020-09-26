@@ -7,7 +7,6 @@
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 #include "Geometry/EcalAlgo/interface/EcalEndcapGeometry.h"
-#include "Geometry/Records/interface/CaloGeometryRecord.h"
 
 #include "DataFormats/Common/interface/Handle.h"
 #include "FWCore/Framework/interface/ESHandle.h"
@@ -30,6 +29,7 @@ EcalTimeDigiProducer::EcalTimeDigiProducer(const edm::ParameterSet &params,
       m_hitsProducerTagEE(params.getParameter<edm::InputTag>("hitsProducerEE")),
       m_hitsProducerTokenEB(sumes.consumes<std::vector<PCaloHit>>(m_hitsProducerTagEB)),
       m_hitsProducerTokenEE(sumes.consumes<std::vector<PCaloHit>>(m_hitsProducerTagEE)),
+      m_geometryToken(sumes.esConsumes()),
       m_timeLayerEB(params.getParameter<int>("timeLayerBarrel")),
       m_timeLayerEE(params.getParameter<int>("timeLayerEndcap")),
       m_Geometry(nullptr) {
@@ -136,14 +136,8 @@ void EcalTimeDigiProducer::finalizeEvent(edm::Event &event, edm::EventSetup cons
 }
 
 void EcalTimeDigiProducer::checkGeometry(const edm::EventSetup &eventSetup) {
-  // TODO find a way to avoid doing this every event
-  edm::ESHandle<CaloGeometry> hGeometry;
-  eventSetup.get<CaloGeometryRecord>().get(hGeometry);
-
-  const CaloGeometry *pGeometry = &*hGeometry;
-
-  if (pGeometry != m_Geometry) {
-    m_Geometry = pGeometry;
+  if (m_geometryWatcher.check(eventSetup)) {
+    m_Geometry = &eventSetup.getData(m_geometryToken);
     updateGeometry();
   }
 }

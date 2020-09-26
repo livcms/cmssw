@@ -12,6 +12,12 @@
 //          Clara Lasaosa Garcia (IFCA)
 //--------------------------------------------------------------
 
+#include "CondFormats/DataRecord/interface/SiPixelQualityRcd.h"
+#include "CondFormats/DataRecord/interface/SiPixelFedCablingMapRcd.h"
+#include "CondFormats/DataRecord/interface/SiPixelLorentzAngleSimRcd.h"
+#include "CondFormats/SiPixelObjects/interface/SiPixelFedCablingMap.h"
+#include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
+#include "FWCore/Utilities/interface/ESGetToken.h"
 #include "SimTracker/SiPhase2Digitizer/plugins/Phase2TrackerDigitizerAlgorithm.h"
 
 // Data formats
@@ -22,7 +28,7 @@
 
 class Pixel3DDigitizerAlgorithm : public Phase2TrackerDigitizerAlgorithm {
 public:
-  Pixel3DDigitizerAlgorithm(const edm::ParameterSet& conf);
+  Pixel3DDigitizerAlgorithm(const edm::ParameterSet& conf, edm::ConsumesCollector iC);
   ~Pixel3DDigitizerAlgorithm() override;
 
   // initialization that cannot be done in the constructor
@@ -58,6 +64,11 @@ private:
   // Raidus of Column np and ohmic
   float _np_column_radius;
   float _ohm_column_radius;
+
+  edm::ESGetToken<SiPixelQuality, SiPixelQualityRcd> siPixelBadModuleToken_;
+  edm::ESGetToken<SiPixelLorentzAngle, SiPixelLorentzAngleSimRcd> siPixelLorentzAngleToken_;
+  const edm::ESGetToken<SiPixelFedCablingMap, SiPixelFedCablingMapRcd> fedCablingMapToken_;
+  const edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> geomToken_;
 
   // Check if a carrier is inside the column: The point should
   // be described in the pixel cell frame

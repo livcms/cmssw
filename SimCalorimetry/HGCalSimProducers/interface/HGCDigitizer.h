@@ -3,6 +3,7 @@
 
 #include "DataFormats/DetId/interface/DetId.h"
 #include "DataFormats/ForwardDetId/interface/ForwardSubdetector.h"
+#include "FWCore/Framework/interface/ESWatcher.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 
 #include "SimDataFormats/CaloHit/interface/PCaloHit.h"
@@ -14,7 +15,8 @@
 #include "SimCalorimetry/HGCalSimProducers/interface/HFNoseDigitizer.h"
 #include "DataFormats/HGCDigi/interface/HGCDigiCollections.h"
 #include "DataFormats/HGCDigi/interface/PHGCSimAccumulator.h"
-#include "FWCore/Framework/interface/ESHandle.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
 #include "Geometry/HGCalGeometry/interface/HGCalGeometry.h"
 #include "Geometry/HcalTowerAlgo/interface/HcalGeometry.h"
 
@@ -85,12 +87,6 @@ public:
   std::string digiCollection() { return digiCollection_; }
   int geometryType() { return geometryType_; }
 
-  /**
-      @short actions at the start/end of run
-   */
-  void beginRun(const edm::EventSetup& es);
-  void endRun();
-
 private:
   uint32_t getType() const;
   bool getWeight(std::array<float, 3>& tdcForToAOnset, float& keV2fC) const;
@@ -127,9 +123,11 @@ private:
   std::unique_ptr<HFNoseDigitizer> theHFNoseDigitizer_;
 
   //geometries
+  const edm::ESGetToken<CaloGeometry, CaloGeometryRecord> geomToken_;
+  edm::ESWatcher<CaloGeometryRecord> geomWatcher_;
   std::unordered_set<DetId> validIds_;
-  const HGCalGeometry* gHGCal_;
-  const HcalGeometry* gHcal_;
+  const HGCalGeometry* gHGCal_ = nullptr;
+  const HcalGeometry* gHcal_ = nullptr;
 
   //detector and subdetector id
   DetId::Detector myDet_;
